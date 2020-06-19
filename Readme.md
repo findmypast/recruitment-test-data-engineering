@@ -52,7 +52,7 @@ Details of how to run and connect to the database are below, together with how t
 - There is no right way to do this. We are interested in the choices that you make, how you justify them, and your development process.
 - Consider how normalized your schema should be, and whether you should be using foreign keys to join tables.
 - When you create a container, make sure that you add the container config to the docker-compose.yml file, and add your Dockerfile and code to the images folder.
-- The example scripts use ORM libraries to connect to the database. This is _not_ essential for the purpose of this test: your code should connect to the database and you queries should be implemented in whatever way you are most comfortable with.
+- The example scripts use ORM libraries to connect to the database. This is _not_ essential for the purpose of this test: your code should connect to the database and your queries should be implemented in whatever way you are most comfortable with.
 - Consider what kind of error handling and testing is appropriate.
 - All data input, storage, and output should be in UTF-8. Expect multi-byte characters in the data.
 - The MySQL database storage is ephemeral; it will not persist, so make sure all schema and data queries are repeatable.

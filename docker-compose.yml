@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  database:
+    image: mysql:8.0
+    command:
+      - '--default-authentication-plugin=mysql_native_password'
+    environment:
+        - MYSQL_RANDOM_ROOT_PASSWORD=yes
+        - MYSQL_DATABASE=codetest
+        - MYSQL_USER=codetest
+        - MYSQL_PASSWORD=swordfish
+    restart: always
+
+  example-node:
+    image: example-node
+    build: images/example-node
+    volumes:
+      - ./data:/data
+
+  example-python:
+    image: example-python
+    build: images/example-python
+    volumes:
+      - ./data:/data
+
+  example-ruby:
+    image: example-ruby
+    build: images/example-ruby
+    volumes:
+      - ./data:/data

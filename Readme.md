@@ -35,7 +35,7 @@ We have provided a Github repo containing:
 
 ## Problem
 
-There are a sequence of steps that we would like you to complete. This should take no more than two hours.
+There are a sequence of steps that we would like you to complete. We hope this won't take more than a few hours of your time.
 
 1. Fork the git repo to your own Github account.
 2. Devise a database schema to hold the data in the people and places CSV files, and apply it to the MySQL database. You may apply this schema via a script, via the MySQL command-line client, or via a GUI client.

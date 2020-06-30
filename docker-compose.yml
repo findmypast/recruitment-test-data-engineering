@@ -26,6 +26,12 @@ services:
     volumes:
       - ./data:/data
 
+  example-r:
+    image: example-r
+    build: images/example-r
+    volumes:
+      - ./data:/data
+
   example-ruby:
     image: example-ruby
     build: images/example-ruby

@@ -10,6 +10,8 @@ services:
         - MYSQL_DATABASE=codetest
         - MYSQL_USER=codetest
         - MYSQL_PASSWORD=swordfish
+    ports:
+      - "3306:3306"
     restart: always
 
   example-node:

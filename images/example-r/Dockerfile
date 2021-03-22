@@ -1,8 +1,8 @@
-FROM r-base:4.0.2
+FROM rocker/tidyverse:4.0.4
 
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update --quiet --yes \
-  && apt-get install --quiet --yes r-cran-rmysql r-cran-tidyverse
-  
+WORKDIR /app
+
+RUN R -e "install.packages('rmysql', dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+
 COPY example.R ./
 CMD ["./example.R"]

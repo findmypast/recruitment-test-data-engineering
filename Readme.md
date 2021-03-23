@@ -25,7 +25,7 @@ We have included example data and scripts. The example schema creates a simple t
 We have provided a Github repo containing:
 
 - A __docker-compose.yml__ file that configures a container for the MySQL database, and the example scripts’ containers.
-- An __images__ folder containing example scripts showing how the database can be accessed from Node, Python, R, and Ruby.
+- An __images__ folder containing example programmes showing how the database can be accessed from C, Node, Python, R, and Ruby.
 - An __example_schema.sql__ file containing a table schema used by the example scripts.
 - A __data__ folder containing four files:
   - __example.csv__ A tiny dataset, used by the example scripts.
@@ -96,7 +96,7 @@ docker-compose run database mysql --host=database --user=codetest --password=swo
 
 ### Example scripts
 
-We have provided example scripts written in Node, Python, R, and Ruby. These show how to use a script in a separate Docker container to connect to the database using an ORM library, to load data from a CSV file, and to query data to output as a JSON file. There should be regarded as illustrative; it is fine to use these technologies in your own solution, but we would prefer that you use technologies that you feel comfortable with.
+We have provided example code written in C, Node, Python, R, and Ruby. These show how to use a programme in a separate Docker container to connect to the database using an ORM library, to load data from a CSV file, and to query data to output as a JSON file. There should be regarded as illustrative; it is fine to use these technologies in your own solution, but we would prefer that you use technologies that you feel comfortable with.
 
 Make sure the MySQL database is running, and then load the example schema with:
 
@@ -104,16 +104,17 @@ Make sure the MySQL database is running, and then load the example schema with:
 docker-compose run database mysql --host=database --user=codetest --password=swordfish codetest <example_schema.sql
 ```
 
-Then make sure that the containers have been built with `docker-compose build` and run one or more of the sample scripts with:
+Then make sure that the containers have been built with `docker-compose build` and run one or more of the sample programmes with:
 
 ```
+docker-compose run example-c
 docker-compose run example-node
 docker-compose run example-python
 docker-compose run example-r
 docker-compose run example-ruby
 ```
 
-In each case, the script loads data from the data/example.csv file into that table, and exports data from the database table to a JSON file in the data folder. Note that the scripts do not truncate the table, so each one you run will add additional content.
+In each case, the programme loads data from the data/example.csv file into that table, and exports data from the database table to a JSON file in the data folder. Note that the scripts do not truncate the table, so each one you run will add additional content.
 
 ### Cleaning up
 

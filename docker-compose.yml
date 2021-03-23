@@ -43,3 +43,9 @@ services:
     build: images/example-ruby
     volumes:
       - ./data:/data
+
+  example-swift:
+    image: example-swift
+    build: images/example-swift
+    volumes:
+      - ./data:/data

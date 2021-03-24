@@ -14,35 +14,35 @@ services:
       - "3306:3306"
     restart: always
 
-  # example-c:
-  #   image: example-c
-  #   build: images/example-c
-  #   volumes:
-  #     - ./data:/data
+  example-c:
+    image: example-c
+    build: images/example-c
+    volumes:
+      - ./data:/data
 
-  # example-node:
-  #   image: example-node
-  #   build: images/example-node
-  #   volumes:
-  #     - ./data:/data
+  example-node:
+    image: example-node
+    build: images/example-node
+    volumes:
+      - ./data:/data
 
-  # example-python:
-  #   image: example-python
-  #   build: images/example-python
-  #   volumes:
-  #     - ./data:/data
+  example-python:
+    image: example-python
+    build: images/example-python
+    volumes:
+      - ./data:/data
 
-  # example-r:
-  #   image: example-r
-  #   build: images/example-r
-  #   volumes:
-  #     - ./data:/data
+  example-r:
+    image: example-r
+    build: images/example-r
+    volumes:
+      - ./data:/data
 
-  # example-ruby:
-  #   image: example-ruby
-  #   build: images/example-ruby
-  #   volumes:
-  #     - ./data:/data
+  example-ruby:
+    image: example-ruby
+    build: images/example-ruby
+    volumes:
+      - ./data:/data
 
   example-rust:
     image: example-rust
@@ -50,8 +50,8 @@ services:
     volumes:
       - ./data:/data
 
-  # example-swift:
-  #   image: example-swift
-  #   build: images/example-swift
-  #   volumes:
-  #     - ./data:/data
+  example-swift:
+    image: example-swift
+    build: images/example-swift
+    volumes:
+      - ./data:/data

@@ -1,15 +1,15 @@
-version: '3.7'
+version: "3.7"
 
 services:
   database:
     image: mysql:8.0
     command:
-      - '--default-authentication-plugin=mysql_native_password'
+      - "--default-authentication-plugin=mysql_native_password"
     environment:
-        - MYSQL_RANDOM_ROOT_PASSWORD=yes
-        - MYSQL_DATABASE=codetest
-        - MYSQL_USER=codetest
-        - MYSQL_PASSWORD=swordfish
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_DATABASE=codetest
+      - MYSQL_USER=codetest
+      - MYSQL_PASSWORD=swordfish
     ports:
       - "3306:3306"
     restart: always
@@ -40,6 +40,12 @@ services:
 
   example-ruby:
     image: example-ruby
+    build: images/example-ruby
+    volumes:
+      - ./data:/data
+
+  example-rust:
+    image: example-rust
     build: images/example-ruby
     volumes:
       - ./data:/data

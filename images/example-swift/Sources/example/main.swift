@@ -31,11 +31,13 @@ Example.findAll { (result: [(Int, Example)]?, error: RequestError?) in
   }
 
   if let rows = result {
-    let text = rows.sorted {$0.0 < $1.0}
-                   .map { item in return "{\"id\":\(item.0),\"name\":\"\(item.1.name)\"}"}
-                   .joined(separator: ",")
+    struct OutputItem : Codable {
+      var id: Int
+      var name: String
+    }
 
-    try! "[\(text)]".write(to: URL(fileURLWithPath: "/data/example_swift.json"), atomically: true, encoding: .utf8)
+    let tidied_rows = rows.map { item in return OutputItem(id: item.0, name: item.1.name) }  
+    try! JSONEncoder().encode(tidied_rows).write(to: URL(fileURLWithPath: "/data/example_swift.json"))
   }
 
   semaphore.signal()

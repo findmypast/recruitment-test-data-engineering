@@ -1,5 +1,8 @@
-FROM rust:1.40
-WORKDIR /usr/src/myapp
+FROM rust:1.40 as builder
+WORKDIR /usr/src/example-rust
 COPY . .
 RUN cargo install --path .
-ENTRYPOINT cargo run
+
+FROM debian:buster-slim
+COPY --from=builder /usr/local/cargo/bin/example-rust /usr/local/bin/example-rust
+CMD ["example-rust"]

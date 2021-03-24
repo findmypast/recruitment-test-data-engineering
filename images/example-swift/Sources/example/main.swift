@@ -17,27 +17,26 @@ struct Example : Model {
 let semaphore = DispatchSemaphore(value: 0)
 let file = try? String(contentsOf: URL(fileURLWithPath: "/data/example.csv"))
 if let text = file {
-  let items = text.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "\n").dropFirst(1)
-  for name in items {
-    let row = Example(name: name)
-    row.save { example, error in
+  for name in text.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "\n").dropFirst(1) {
+    Example(name: name).save { example, error in
       semaphore.signal()
     }
     semaphore.wait()
   }
 }
 
-Example.findAll { (result: [Int: Example]?, error: RequestError?) in
+Example.findAll { (result: [(Int, Example)]?, error: RequestError?) in
   if let rows = result {
-    let name_rows = rows.mapValues { example in
-      return example.name
-    }
+    let json = "[" + rows.sorted {
+      $0.0 < $1.0
+    }.map { item in
+      return "{\"id\":\(item.0),\"name\":\"\(item.1.name)\"}"
+    }.joined(separator: ",") + "]"
 
     do {
-        let json_data = try JSONEncoder().encode(name_rows)
-        try json_data.write(to: URL(fileURLWithPath: "/data/example_swift.json"))
+      try json.write(to: URL(fileURLWithPath: "/data/example_swift.json"), atomically: true, encoding: .utf8)
     } catch {
-        print(error)
+      print(error)
     }
   }
 

@@ -18,7 +18,7 @@ The pairing phase is to give us an indication of what it will be like for us to 
 - Familiarity with Docker for container management, which we use through the Docker Compose tool. You will need Docker and Docker Compose installed on your development machine.
 - Familiarity with Git for source control, and a github.com account which will be used for sharing your code.
 
-We have included example data and scripts. The example schema creates a simple table, with example scripts in three common languages to load data from a CSV file and output to a JSON file. There are instructions towards the bottom of this document explaining how to use the Docker containers, start the database, and use the examples.
+We have included example data and programme code. The example schema creates a simple table, with example code in several common programming languages to load data from a CSV file and output to a JSON file. There are instructions towards the bottom of this document explaining how to use the Docker containers, start the database, and use the examples.
 
 ## Background
 

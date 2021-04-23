@@ -76,7 +76,6 @@ fn main() -> Result<()> {
   let mut conn = connect_to_db();
   let records = read_csv();
 
-// Doesn't work for some reason :(
   conn.exec_batch(
     r"INSERT INTO examples (name)
       VALUES (:name)",

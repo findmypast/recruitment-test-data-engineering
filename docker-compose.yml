@@ -3,6 +3,7 @@ version: "3.7"
 services:
   database:
     image: mysql:8.0
+    platform: linux/amd64
     command:
       - "--default-authentication-plugin=mysql_native_password"
     environment:
@@ -51,6 +52,7 @@ services:
 
   example-swift:
     image: example-swift
+    platform: linux/amd64
     build: images/example-swift
     command: ["swift", "run"]
     volumes:

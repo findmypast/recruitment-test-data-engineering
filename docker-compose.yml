@@ -44,12 +44,6 @@ services:
     volumes:
       - ./data:/data
 
-  example-rust:
-    image: example-rust
-    build: images/example-rust
-    volumes:
-      - ./data:/data
-
   example-swift:
     image: example-swift
     build: images/example-swift

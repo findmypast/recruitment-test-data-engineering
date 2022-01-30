@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
 
 Base = declarative_base()
-ARRAY_SIZE = 5000
+BATCH_SIZE = 5000
 
 
 class Place(Base):
@@ -41,7 +41,6 @@ class PersonStage(Base):
     family_name = Column(String(80))
     date_of_birth = Column(Date())
     place_of_birth = Column(String(80))
-    place_of_birth_id = Column(Integer)
 
 
 class Person(Base):
@@ -69,6 +68,12 @@ class MissingPlaceException(Exception):
 
 class PeopleRowCountDoesNotMatchException(Exception):
     """Exception raised number of rows in people_stage and people does not match"""
+
+    pass
+
+
+class UnexpectedPlaceTotalsException(Exception):
+    """Exception raised when the total number of place counts does not match the total number of people"""
 
     pass
 
@@ -116,7 +121,7 @@ def load_data(csv_filename, load_func):
         for row in reader:
             object_list.append(load_func(row))
             batch_count = batch_count + 1
-            if batch_count >= ARRAY_SIZE:
+            if batch_count >= BATCH_SIZE:
                 session = Session(bind=engine)
                 session.bulk_save_objects(object_list)
                 session.commit()
@@ -124,6 +129,7 @@ def load_data(csv_filename, load_func):
                 number_of_csv_lines = number_of_csv_lines + batch_count
                 batch_count = 0
                 print(f"Rows loaded : {number_of_csv_lines}")
+
         if batch_count > 0:
             session = Session(bind=engine)
             session.bulk_save_objects(object_list)
@@ -133,7 +139,7 @@ def load_data(csv_filename, load_func):
         return number_of_csv_lines
 
 
-def compare_load_data(no_of_csv_rows, table):
+def verify_data_load(no_of_csv_rows, table):
     """Compare the number of rows in the csv file and the row count"""
     print("No of csv rows : ", no_of_csv_rows)
 
@@ -148,8 +154,8 @@ def compare_load_data(no_of_csv_rows, table):
         raise RowCountDoesNotMatchException()
 
 
-def check_all_places_exist():
-    """Check that all places of birth in the people_stage table exist in the places table"""
+def verify_all_places_exist():
+    """Verify that all places of birth in the people_stage table exist in the places table"""
     session = Session(bind=engine)
     query = session.query(Person).filter(
         ~exists().where(PersonStage.place_of_birth == Place.city)
@@ -183,13 +189,13 @@ def update_place_of_birth(places_table, people_stage_table):
 
             results = session.execute(source_query.statement)
             while True:
-                recs = results.fetchmany(ARRAY_SIZE)
+                recs = results.fetchmany(BATCH_SIZE)
                 _total = len(recs)
                 total += _total
                 if _total > 0:
                     session.bulk_save_objects(create_person_list(recs))
                     session.commit()
-                if _total < ARRAY_SIZE:
+                if _total < BATCH_SIZE:
                     break
             session.close()
 
@@ -202,8 +208,8 @@ def update_place_of_birth(places_table, people_stage_table):
     return total
 
 
-def validate_people_table(people_stage_table, people_table):
-    """Confirm that the number of rows in the people table matches the people_stage table"""
+def verify_people_table(people_stage_table, people_table):
+    """Verify that people table matches the people_stage table"""
     session = Session(bind=engine)
     people_stage_row_count = session.query(people_stage_table).count()
     print("No of people_stage rows : ", people_stage_row_count)
@@ -224,7 +230,7 @@ def drop_staging_table(staging_tables):
         stage_table.drop(engine)
 
 
-def output_summary(people_table, places_table):
+def output_summary(people_table, places_table, expected_total):
     """Output the table to a JSON file"""
     with open("/data/summary_output.json", "w", encoding="utf-8") as json_file:
         session = Session(bind=engine)
@@ -241,7 +247,15 @@ def output_summary(people_table, places_table):
         result = connection.execute(source_query.statement).fetchall()
         session.close()
 
-        rows = [{row[0]: row[1]} for row in result]
+        total_count = 0
+        rows = []
+        for row in result:
+            rows.append({row[0]: row[1]})
+            total_count = total_count + row[1]
+
+        if expected_total != total_count:
+            raise UnexpectedPlaceTotalsException()
+
         json.dump(rows, json_file, separators=(",", ":"))
         print(rows)
 
@@ -263,24 +277,24 @@ People = Table("people", metadata, autoload=True, autoload_with=engine)
 # read the places CSV data file into the table
 print("Loading places")
 no_csv_places = load_data("/data/places.csv", create_place)
-compare_load_data(no_csv_places, Place)
+verify_data_load(no_csv_places, Place)
 
 print()
 print("Loading people")
 no_csv_people = load_data("/data/people.csv", create_personstage)
-compare_load_data(no_csv_people, PersonStage)
+verify_data_load(no_csv_people, PersonStage)
 
 print()
-print("Check all places of birth exist in places")
-check_all_places_exist()
+print("Verify all places of birth exist in places")
+verify_all_places_exist()
 
 print()
 print("Set place_of_birth foreign key")
 update_place_of_birth(Places, PeopleStage)
 
 print()
-print("Validate people table is correct")
-validate_people_table(PeopleStage, People)
+print("Verify people table is correct")
+verify_people_table(PeopleStage, People)
 
 print()
 print("Drop staging tables")
@@ -288,4 +302,4 @@ drop_staging_table([PeopleStage])
 
 print()
 print("Output summary")
-output_summary(People, Places)
+output_summary(People, Places, no_csv_people)

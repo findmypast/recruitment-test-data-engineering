@@ -107,7 +107,7 @@ def load_data(csv_filename, load_func):
     """Load data from csv file into a table. The function is supplied to create the object from the data"""
     object_list = []
 
-    with open(csv_filename) as csv_file:
+    with open(csv_filename, encoding="utf-8") as csv_file:
         number_of_csv_lines = 0
         reader = csv.reader(csv_file)
         next(reader)
@@ -204,7 +204,7 @@ def validate_people_table(people_stage_table, people_table):
 
 def output_summary(people_table, places_table):
     """Output the table to a JSON file"""
-    with open("/data/summary_output.json", "w") as json_file:
+    with open("/data/summary_output.json", "w", encoding='utf-8') as json_file:
         session = Session(bind=engine)
 
         source_query = (

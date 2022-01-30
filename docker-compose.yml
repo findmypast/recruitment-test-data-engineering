@@ -43,6 +43,13 @@ services:
     volumes:
       - ./data:/data
 
+  robward-test:
+    image: robward
+    build: images/robward
+    command: ["pytest"]
+    volumes:
+      - ./data:/data
+
   example-r:
     image: example-r
     build: images/example-r

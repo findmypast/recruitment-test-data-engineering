@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+"""File to import places and people csv files into database tables"""
 import contextlib
 import csv
 import json
@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
 
 Base = declarative_base()
-ARRAY_SIZE = 1000
+ARRAY_SIZE = 5000
 
 
 class Place(Base):
@@ -105,19 +105,31 @@ def create_person_list(rows):
 
 def load_data(csv_filename, load_func):
     """Load data from csv file into a table. The function is supplied to create the object from the data"""
-    object_list = []
 
     with open(csv_filename, encoding="utf-8") as csv_file:
         number_of_csv_lines = 0
         reader = csv.reader(csv_file)
         next(reader)
+        object_list = []
+
+        batch_count = 0
         for row in reader:
             object_list.append(load_func(row))
-            number_of_csv_lines = number_of_csv_lines + 1
+            batch_count = batch_count + 1
+            if batch_count >= ARRAY_SIZE:
+                session = Session(bind=engine)
+                session.bulk_save_objects(object_list)
+                session.commit()
+                object_list = []
+                number_of_csv_lines = number_of_csv_lines + batch_count
+                batch_count = 0
+                print(f"Rows loaded : {number_of_csv_lines}")
+        if batch_count > 0:
+            session = Session(bind=engine)
+            session.bulk_save_objects(object_list)
+            session.commit()
+            number_of_csv_lines = number_of_csv_lines + batch_count
 
-        session = Session(bind=engine)
-        session.bulk_save_objects(object_list)
-        session.commit()
         return number_of_csv_lines
 
 
@@ -127,6 +139,7 @@ def compare_load_data(no_of_csv_rows, table):
 
     session = Session(bind=engine)
     db_row_count = session.query(table).count()
+    session.close()
     print("No of db rows  : ", db_row_count)
 
     if no_of_csv_rows == db_row_count:
@@ -142,7 +155,7 @@ def check_all_places_exist():
         ~exists().where(PersonStage.place_of_birth == Place.city)
     )
     missing_places = session.execute(query.statement)
-
+    session.close()
     if missing_places is None:
         print("place_of_birth records that do not match places:")
         for row in missing_places:
@@ -171,7 +184,6 @@ def update_place_of_birth(places_table, people_stage_table):
             results = session.execute(source_query.statement)
             while True:
                 recs = results.fetchmany(ARRAY_SIZE)
-                print(recs)
                 _total = len(recs)
                 total += _total
                 if _total > 0:
@@ -179,6 +191,8 @@ def update_place_of_birth(places_table, people_stage_table):
                     session.commit()
                 if _total < ARRAY_SIZE:
                     break
+            session.close()
+
         # done
         print(f"{total} records copied")
     except NoSuchTableError as e1:
@@ -195,6 +209,7 @@ def validate_people_table(people_stage_table, people_table):
     print("No of people_stage rows : ", people_stage_row_count)
 
     people_row_count = session.query(people_table).count()
+    session.close()
 
     print("No of people rows       : ", people_row_count)
 
@@ -202,9 +217,16 @@ def validate_people_table(people_stage_table, people_table):
         raise PeopleRowCountDoesNotMatchException()
 
 
+def drop_staging_table(staging_tables):
+    """Drop staging tables when they are no longer needed"""
+    for stage_table in staging_tables:
+        print(f"Dropping {stage_table.name}")
+        stage_table.drop(engine)
+
+
 def output_summary(people_table, places_table):
     """Output the table to a JSON file"""
-    with open("/data/summary_output.json", "w", encoding='utf-8') as json_file:
+    with open("/data/summary_output.json", "w", encoding="utf-8") as json_file:
         session = Session(bind=engine)
 
         source_query = (
@@ -217,8 +239,11 @@ def output_summary(people_table, places_table):
         )
 
         result = connection.execute(source_query.statement).fetchall()
+        session.close()
+
         rows = [{row[0]: row[1]} for row in result]
         json.dump(rows, json_file, separators=(",", ":"))
+        print(rows)
 
 
 # connect to the database
@@ -256,6 +281,10 @@ update_place_of_birth(Places, PeopleStage)
 print()
 print("Validate people table is correct")
 validate_people_table(PeopleStage, People)
+
+print()
+print("Drop staging tables")
+drop_staging_table([PeopleStage])
 
 print()
 print("Output summary")

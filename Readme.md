@@ -102,7 +102,7 @@ We have provided example code written in C, Node, Python, R, Ruby, and Swift. Th
 Make sure the MySQL database is running, and then load the example schema with:
 
 ```
-docker compose run database mysql --host=database --user=codetest --password=swordfish codetest <example_schema.sql
+docker compose run --no-TTY database mysql --host=database --user=codetest --password=swordfish codetest <example_schema.sql
 ```
 
 Then make sure that the containers have been built with `docker compose build` and run one or more of the sample programmes with:

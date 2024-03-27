@@ -1,0 +1,7 @@
+mysqlclient ~= 2.1.0
+SQLAlchemy ~= 2.0.29
+pandas ~= 2.2.1
+
+
+
+

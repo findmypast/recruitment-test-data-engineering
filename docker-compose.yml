@@ -17,15 +17,18 @@ services:
 
   load_data:
     image: load_data
-    build: images/load_data
+    build:
+      context: .
+      dockerfile: images/load_data/Dockerfile
     command: ["python", "./read_data.py"]
     volumes:
       - ./data:/data
 
   output:
     image: output
-    build: images/output
+    build:
+      context: .
+      dockerfile: images/output/Dockerfile
     command: [ "python", "./summary.py" ]
     volumes:
       - ./data:/data
-

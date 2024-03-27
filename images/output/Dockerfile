@@ -2,7 +2,8 @@ FROM python:3.10
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY images/output/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY summary.py ./
+COPY images/output/summary.py ./
+COPY model.py ./
